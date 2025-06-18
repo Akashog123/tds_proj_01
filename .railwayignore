@@ -54,6 +54,7 @@ Thumbs.db
 # Authentication files
 auth.json
 
-# ChromaDB persistent storage
+# ChromaDB persistent storage (but keep precomputed embeddings)
 chroma_db/
 ./chroma_db/
+!precomputed_embeddings/

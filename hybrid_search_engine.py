@@ -288,6 +288,28 @@ class HybridEmbeddingSearchEngine:
             except Exception as e:
                 logger.error(f"Error adding embeddings to ChromaDB: {e}")
     
+    def build_local_embeddings_cache(self):
+        """Build local embeddings cache from existing data"""
+        if not self.local_model or not self.subthreads:
+            logger.warning("Local model or subthreads not available")
+            return
+        
+        logger.info("Building local embeddings cache...")
+        self.local_embeddings_cache = {}
+        
+        for topic_id, subthread in self.subthreads.items():
+            title = subthread.get('topic_title', '')
+            content = subthread.get('combined_content', '')
+            combined_text = f"{title} {content}"
+            processed_text = self.preprocess_text(combined_text)
+            
+            if processed_text:
+                local_emb = self.get_local_embedding(processed_text)
+                if local_emb:
+                    self.local_embeddings_cache[f"topic_{topic_id}"] = local_emb
+        
+        logger.info(f"Built local embeddings cache with {len(self.local_embeddings_cache)} embeddings")
+    
     def build_tfidf_fallback(self):
         """Build TF-IDF index as fallback"""
         if not self.subthreads:

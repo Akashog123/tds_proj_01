@@ -1,0 +1,19 @@
+[phases.setup]
+nixPkgs = ["python39"]
+
+[phases.install]
+cmds = [
+    "pip install --upgrade pip",
+    "pip install -r requirements.txt"
+]
+
+[phases.build]
+cmds = [
+    "python -c 'import sys; print(f\"Python version: {sys.version}\")'",
+    "python -c 'import os; print(f\"discourse_posts.json exists: {os.path.exists(\"discourse_posts.json\")}\")'",
+    "python -c 'from hybrid_search_engine import HybridEmbeddingSearchEngine; print(\"Hybrid engine import successful\")'",
+    "python -c 'import chromadb, openai, sentence_transformers; print(\"All dependencies imported successfully\")'"
+]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"

@@ -1,5 +1,6 @@
 [build]
 builder = "NIXPACKS"
+nixpacksConfigPath = "nixpacks.toml"
 
 [deploy]
 startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
@@ -8,4 +9,8 @@ restartPolicyMaxRetries = 10
 
 [deploy.healthcheck]
 httpPath = "/health"
-timeoutSeconds = 60
+timeoutSeconds = 120
+
+[environments.production.build]
+builder = "NIXPACKS"
+nixpacksConfigPath = "nixpacks.toml"

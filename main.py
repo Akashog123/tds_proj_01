@@ -16,12 +16,30 @@ import numpy as np
 from dotenv import load_dotenv
 load_dotenv()
 
-# Import the new hybrid search engine
-from hybrid_search_engine import HybridEmbeddingSearchEngine
+# Import the fast hybrid search engine
+from fast_hybrid_search_engine import FastHybridEmbeddingSearchEngine
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
+
+# Add startup diagnostics
+logger.info("=== TDS Virtual TA Startup Diagnostics ===")
+import sys
+logger.info(f"Python version: {sys.version}")
+logger.info(f"Working directory: {os.getcwd()}")
+logger.info(f"PORT environment variable: {os.getenv('PORT', 'Not set')}")
+logger.info(f"OPENAI_API_KEY set: {'Yes' if os.getenv('OPENAI_API_KEY') else 'No'}")
+logger.info(f"OPENAI_BASE_URL: {os.getenv('OPENAI_BASE_URL', 'Not set')}")
+
+# Check critical files
+discourse_file = "discourse_posts.json"
+logger.info(f"discourse_posts.json exists: {os.path.exists(discourse_file)}")
+if os.path.exists(discourse_file):
+    logger.info(f"discourse_posts.json size: {os.path.getsize(discourse_file) / 1024:.1f} KB")
 
 # Pydantic models for request/response
 class QuestionRequest(BaseModel):
@@ -43,13 +61,22 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Initialize search engine with hybrid embeddings
-search_engine = HybridEmbeddingSearchEngine()
+# Initialize search engine with fast hybrid embeddings
+logger.info("Initializing FastHybridEmbeddingSearchEngine...")
+try:
+    search_engine = FastHybridEmbeddingSearchEngine()
+    logger.info("✅ FastHybridEmbeddingSearchEngine initialized successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to initialize FastHybridEmbeddingSearchEngine: {e}")
+    logger.error(f"Exception type: {type(e).__name__}")
+    import traceback
+    logger.error(f"Traceback: {traceback.format_exc()}")
+    raise
 
 class QuestionAnswerer:
     """Generate answers based on search results"""
     
-    def __init__(self, search_engine: HybridEmbeddingSearchEngine):
+    def __init__(self, search_engine: FastHybridEmbeddingSearchEngine):
         self.search_engine = search_engine
     
     def extract_relevant_excerpt(self, post: Dict[str, Any], query: str, max_length: int = 200) -> str:
