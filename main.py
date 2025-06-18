@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from typing import List, Optional, Dict, Any
 from pathlib import Path
 import base64
@@ -340,4 +341,6 @@ async def answer_question(request: QuestionRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    # Use PORT environment variable for Railway compatibility, default to 8000 for local development
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

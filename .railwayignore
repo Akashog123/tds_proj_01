@@ -1,0 +1,54 @@
+# Development files
+test_api.py
+validate_promptfoo.py
+final_validation.py
+run_server.py
+
+# Test data and configurations
+project-tds-virtual-ta-promptfoo.yaml
+
+# Cache and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache/
+.coverage
+
+# Development environment
+.env
+.venv/
+venv/
+ENV/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Documentation (if large)
+*.md
+!README.md
+
+# Git files
+.git/
+.gitignore
+
+# Log files
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Authentication files
+auth.json
