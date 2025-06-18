@@ -23,10 +23,10 @@
     "build": {
       "cmds": [
         "echo '🔧 NIXPACKS: Building application...'",
-        "python -c 'import sys; print(f\"Python version: {sys.version}\")'",
-        "python -c 'import os; print(f\"discourse_posts.json exists: {os.path.exists(\"discourse_posts.json\")}\")'",
-        "python -c 'from fast_hybrid_search_engine import FastHybridEmbeddingSearchEngine; print(\"Fast hybrid engine import successful\")'", 
-        "python -c 'import chromadb, openai, sentence_transformers; print(\"All dependencies imported successfully\")'",
+        "python -c \"import sys; print('Python version: ' + sys.version)\"",
+        "python -c \"import os; print('discourse_posts.json exists: ' + str(os.path.exists('discourse_posts.json')))\"",
+        "python -c \"from fast_hybrid_search_engine import FastHybridEmbeddingSearchEngine; print('Fast hybrid engine import successful')\"",
+        "python -c \"import chromadb, openai, sentence_transformers; print('All dependencies imported successfully')\"",
         "echo '✅ NIXPACKS: Build completed successfully'"
       ]
     }
