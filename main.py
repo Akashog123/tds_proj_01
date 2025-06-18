@@ -7,6 +7,7 @@ import base64
 import re
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -59,6 +60,21 @@ app = FastAPI(
     title="TDS Virtual Teaching Assistant",
     description="Virtual Teaching Assistant for discourse post searching and question answering",
     version="1.0.0"
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://exam.sanand.workers.dev",
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "http://localhost",
+        "*"  # Allow all origins for development/testing
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "OPTIONS", "HEAD"],
+    allow_headers=["Content-Type", "Authorization", "Accept"],
 )
 
 # Initialize search engine with fast hybrid embeddings

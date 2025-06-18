@@ -47,10 +47,16 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://exam.sanand.workers.dev",
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "http://localhost",
+        "*"  # Allow all origins for development/testing
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS", "HEAD"],
+    allow_headers=["Content-Type", "Authorization", "Accept"],
 )
 
 # Initialize lightweight search engine for Railway
@@ -69,6 +75,18 @@ except Exception as e:
 class QueryRequest(BaseModel):
     query: str
     top_k: Optional[int] = 5
+
+class QuestionRequest(BaseModel):
+    question: str
+    image: Optional[str] = None
+
+class Link(BaseModel):
+    url: str
+    text: str
+
+class QuestionResponse(BaseModel):
+    answer: str
+    links: List[Dict[str, str]]
 
 class SearchResult(BaseModel):
     topic_id: int
@@ -185,6 +203,51 @@ async def ask_question(request: QueryRequest):
     except Exception as e:
         logger.error(f"Question answering error: {e}")
         raise HTTPException(status_code=500, detail=f"Question answering failed: {str(e)}")
+
+@app.post("/api/", response_model=QuestionResponse)
+async def answer_question_api(request: QuestionRequest):
+    """
+    Answer student questions based on discourse posts (compatible with main.py API)
+    
+    - **question**: The student's question (required)
+    - **image**: Optional base64 encoded image attachment
+    """
+    try:
+        logger.info(f"Received question via /api/: {request.question[:100]}...")
+        
+        # Handle image if provided (basic processing)
+        if request.image:
+            try:
+                import base64
+                # Validate base64 image (basic check)
+                base64.b64decode(request.image, validate=True)
+                logger.info("Image attachment received and validated")
+                # For now, we'll acknowledge the image but not process it fully
+            except Exception as e:
+                logger.warning(f"Invalid image data: {e}")
+        
+        # Get answer using the existing QA system
+        answer_data = qa_system.answer_question(request.question, top_k=5)
+        
+        # Convert to the expected response format
+        links = []
+        for source in answer_data.get('sources', []):
+            links.append({
+                "url": source.get('url', ''),
+                "text": source.get('title', '')[:150] + "..." if len(source.get('title', '')) > 150 else source.get('title', '')
+            })
+        
+        response = QuestionResponse(
+            answer=answer_data.get('answer', 'No answer could be generated.'),
+            links=links
+        )
+        
+        logger.info(f"Generated response with {len(links)} links via /api/")
+        return response
+        
+    except Exception as e:
+        logger.error(f"Error processing question via /api/: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error while processing question")
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
