@@ -1,6 +1,6 @@
 {
-  "created_timestamp": 1750267288.187498,
-  "total_size_mb": 0.9671192169189453,
+  "created_timestamp": 1750268551.493333,
+  "total_size_mb": 0.9671182632446289,
   "files_created": [
     "local_embeddings.pkl",
     "search_indices.json",
