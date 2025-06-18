@@ -12,6 +12,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv()
+
+# Import the new hybrid search engine
+from hybrid_search_engine import HybridEmbeddingSearchEngine
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -36,140 +43,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
-class DiscourseSearchEngine:
-    """Search engine for discourse posts using TF-IDF and cosine similarity"""
-    
-    def __init__(self, posts_file: str = "discourse_posts.json"):
-        self.posts = []
-        self.vectorizer = None
-        self.tfidf_matrix = None
-        self.staff_authors = {"s.anand", "carlton", "Jivraj"}
-        self.load_posts(posts_file)
-        self.build_search_index()
-    
-    def load_posts(self, posts_file: str):
-        """Load discourse posts from JSON file"""
-        try:
-            with open(posts_file, 'r', encoding='utf-8') as f:
-                self.posts = json.load(f)
-            logger.info(f"Loaded {len(self.posts)} discourse posts")
-        except Exception as e:
-            logger.error(f"Error loading posts: {e}")
-            self.posts = []
-    
-    def preprocess_text(self, text: str) -> str:
-        """Clean and preprocess text for better matching"""
-        if not text:
-            return ""
-        
-        # Remove URLs
-        text = re.sub(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', '', text)
-        
-        # Remove HTML tags
-        text = re.sub(r'<[^>]+>', '', text)
-        
-        # Remove extra whitespace
-        text = re.sub(r'\s+', ' ', text).strip()
-        
-        return text.lower()
-    
-    def build_search_index(self):
-        """Build TF-IDF search index from posts"""
-        if not self.posts:
-            logger.warning("No posts available to build search index")
-            return
-        
-        # Combine title and content for each post
-        documents = []
-        for post in self.posts:
-            title = post.get('topic_title', '')
-            content = post.get('content', '')
-            combined_text = f"{title} {content}"
-            processed_text = self.preprocess_text(combined_text)
-            documents.append(processed_text)
-        
-        # Build TF-IDF vectorizer and matrix
-        self.vectorizer = TfidfVectorizer(
-            max_features=5000,
-            stop_words='english',
-            ngram_range=(1, 2),
-            min_df=1,
-            max_df=0.95
-        )
-        
-        try:
-            self.tfidf_matrix = self.vectorizer.fit_transform(documents)
-            logger.info(f"Built search index with {self.tfidf_matrix.shape[0]} documents and {self.tfidf_matrix.shape[1]} features")
-        except Exception as e:
-            logger.error(f"Error building search index: {e}")
-            self.tfidf_matrix = None
-    
-    def calculate_post_score(self, post: Dict[str, Any], similarity_score: float) -> float:
-        """Calculate overall score for a post based on multiple factors"""
-        score = similarity_score
-        
-        # Boost staff answers
-        if post.get('author', '') in self.staff_authors:
-            score *= 2.0
-        
-        # Boost based on engagement
-        like_count = post.get('like_count', 0)
-        reply_count = post.get('reply_count', 0)
-        
-        # Add engagement bonus (normalized)
-        engagement_bonus = (like_count * 0.1) + (reply_count * 0.05)
-        score += engagement_bonus
-        
-        # Boost accepted answers
-        if post.get('is_accepted_answer', False):
-            score *= 1.5
-        
-        # Slightly boost newer posts (within reason)
-        # This is a simple heuristic - could be improved with actual date parsing
-        
-        return score
-    
-    def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
-        """Search for relevant posts using TF-IDF similarity"""
-        if not self.vectorizer or self.tfidf_matrix is None:
-            logger.warning("Search index not available")
-            return []
-        
-        try:
-            # Process query
-            processed_query = self.preprocess_text(query)
-            
-            # Transform query to TF-IDF vector
-            query_vector = self.vectorizer.transform([processed_query])
-            
-            # Calculate cosine similarity
-            similarities = cosine_similarity(query_vector, self.tfidf_matrix).flatten()
-            
-            # Calculate scores and rank posts
-            scored_posts = []
-            for i, similarity in enumerate(similarities):
-                if similarity > 0.01:  # Minimum similarity threshold
-                    post = self.posts[i].copy()
-                    final_score = self.calculate_post_score(post, similarity)
-                    post['similarity_score'] = similarity
-                    post['final_score'] = final_score
-                    scored_posts.append(post)
-            
-            # Sort by final score and return top results
-            scored_posts.sort(key=lambda x: x['final_score'], reverse=True)
-            return scored_posts[:top_k]
-            
-        except Exception as e:
-            logger.error(f"Error during search: {e}")
-            return []
-
-# Initialize search engine
-search_engine = DiscourseSearchEngine()
+# Initialize search engine with hybrid embeddings
+search_engine = HybridEmbeddingSearchEngine()
 
 class QuestionAnswerer:
     """Generate answers based on search results"""
     
-    def __init__(self, search_engine: DiscourseSearchEngine):
+    def __init__(self, search_engine: HybridEmbeddingSearchEngine):
         self.search_engine = search_engine
     
     def extract_relevant_excerpt(self, post: Dict[str, Any], query: str, max_length: int = 200) -> str:
@@ -284,7 +164,11 @@ async def health_check():
     return {
         "status": "healthy",
         "posts_loaded": len(search_engine.posts),
-        "search_index_ready": search_engine.tfidf_matrix is not None
+        "subthreads_extracted": len(search_engine.subthreads),
+        "chromadb_ready": search_engine.collection is not None,
+        "openai_client_ready": search_engine.openai_client is not None,
+        "local_model_ready": search_engine.local_model is not None,
+        "tfidf_fallback_ready": search_engine.tfidf_matrix is not None
     }
 
 @app.post("/api/", response_model=QuestionResponse)

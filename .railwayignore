@@ -1,5 +1,6 @@
 # Development files
 test_api.py
+test_hybrid_search.py
 validate_promptfoo.py
 final_validation.py
 run_server.py
@@ -52,3 +53,7 @@ Thumbs.db
 
 # Authentication files
 auth.json
+
+# ChromaDB persistent storage
+chroma_db/
+./chroma_db/
