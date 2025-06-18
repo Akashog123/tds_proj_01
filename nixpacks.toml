@@ -2,7 +2,7 @@
 NIXPACKS_PYTHON_VERSION = "3.9"
 
 [phases.setup]
-nixPkgs = ["python39Full", "python39Packages.pip", "python39Packages.setuptools", "python39Packages.wheel"]
+nixPkgs = ["python39", "python39Packages.pip", "python39Packages.virtualenv"]
 
 [phases.install]
 cmds = [
@@ -10,11 +10,11 @@ cmds = [
     "python --version",
     "which python",
     "python -c 'import sys; print(sys.executable)'",
-    "# Try to install pip if missing",
-    "python -m ensurepip --upgrade || echo 'ensurepip not available'",
-    "python -m pip --version || (echo 'Installing pip manually' && python -c 'import urllib.request; urllib.request.urlretrieve(\"https://bootstrap.pypa.io/get-pip.py\", \"get-pip.py\")' && python get-pip.py)",
-    "python -m pip install --upgrade pip",
-    "python -m pip install -r requirements.txt",
+    "# Create virtual environment to avoid externally-managed-environment error",
+    "python -m venv /opt/venv",
+    "source /opt/venv/bin/activate",
+    "/opt/venv/bin/python -m pip install --upgrade pip",
+    "/opt/venv/bin/python -m pip install -r requirements.txt",
     "echo '✅ NIXPACKS: Dependencies installed successfully'"
 ]
 
@@ -29,4 +29,4 @@ cmds = [
 ]
 
 [start]
-cmd = "python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
+cmd = "/opt/venv/bin/python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
