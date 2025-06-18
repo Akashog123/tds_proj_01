@@ -58,3 +58,4 @@ auth.json
 chroma_db/
 ./chroma_db/
 !precomputed_embeddings/
+!.nixpacks/

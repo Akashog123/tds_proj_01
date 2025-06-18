@@ -1,19 +1,28 @@
+[variables]
+NIXPACKS_PYTHON_VERSION = "3.9"
+
 [phases.setup]
-nixPkgs = ["python39"]
+nixPkgs = ["python39", "python39Packages.pip", "python39Packages.virtualenv"]
 
 [phases.install]
 cmds = [
-    "pip install --upgrade pip",
-    "pip install -r requirements.txt"
+    "echo '🚀 NIXPACKS: Installing Python dependencies...'",
+    "python --version",
+    "python -m pip --version",
+    "python -m pip install --upgrade pip",
+    "python -m pip install -r requirements.txt",
+    "echo '✅ NIXPACKS: Dependencies installed successfully'"
 ]
 
 [phases.build]
 cmds = [
+    "echo '🔧 NIXPACKS: Building application...'",
     "python -c 'import sys; print(f\"Python version: {sys.version}\")'",
     "python -c 'import os; print(f\"discourse_posts.json exists: {os.path.exists(\"discourse_posts.json\")}\")'",
-    "python -c 'from hybrid_search_engine import HybridEmbeddingSearchEngine; print(\"Hybrid engine import successful\")'",
-    "python -c 'import chromadb, openai, sentence_transformers; print(\"All dependencies imported successfully\")'"
+    "python -c 'from fast_hybrid_search_engine import FastHybridEmbeddingSearchEngine; print(\"Fast hybrid engine import successful\")'",
+    "python -c 'import chromadb, openai, sentence_transformers; print(\"All dependencies imported successfully\")'",
+    "echo '✅ NIXPACKS: Build completed successfully'"
 ]
 
 [start]
-cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+cmd = "python -m uvicorn main:app --host 0.0.0.0 --port $PORT"
