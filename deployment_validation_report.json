@@ -1,0 +1,19 @@
+{
+  "status": "ready",
+  "deployment_size_mb": 1.7643871307373047,
+  "startup_time_seconds": 0.17263388633728027,
+  "average_search_time_ms": 4.775190353393555,
+  "total_discussions": 117,
+  "staff_authors": 3,
+  "essential_files": [
+    "main-ultra-railway.py",
+    "ultra_lightweight_engine.py",
+    "requirements-ultra-light.txt",
+    "discourse_posts.json",
+    "railway.toml",
+    "nixpacks.toml",
+    "precomputed_ultra",
+    ".nixpacks"
+  ],
+  "checklist_completed": 12
+}

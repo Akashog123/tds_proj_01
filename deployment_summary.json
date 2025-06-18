@@ -1,0 +1,31 @@
+{
+  "deployment_type": "ultra_lightweight",
+  "timestamp": 1750267067.941509,
+  "precomputed_data": {
+    "created_timestamp": 1750267066.0237284,
+    "total_size_mb": 0.9671182632446289,
+    "files_created": [
+      "local_embeddings.pkl",
+      "search_indices.json",
+      "subthreads_light.json",
+      "tfidf_data.pkl",
+      "ultra_metadata.json"
+    ],
+    "openai_embeddings": 0,
+    "local_embeddings": 117,
+    "tfidf_features": 5000,
+    "subthreads_count": 117,
+    "compression_ratios": {
+      "openai": 0,
+      "local": 2.1670063064475285,
+      "tfidf": 36.70185234562479
+    }
+  },
+  "files_modified": [
+    "requirements.txt (updated to ultra-lightweight)",
+    "railway.toml (updated for ultra-lightweight app)",
+    "precomputed_ultra/ (created with all precomputed data)"
+  ],
+  "railway_ready": true,
+  "total_deployment_size_mb": 71.94195175170898
+}

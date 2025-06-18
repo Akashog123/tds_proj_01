@@ -1,0 +1,20 @@
+{
+  "created_timestamp": 1750267288.187498,
+  "total_size_mb": 0.9671192169189453,
+  "files_created": [
+    "local_embeddings.pkl",
+    "search_indices.json",
+    "subthreads_light.json",
+    "tfidf_data.pkl",
+    "ultra_metadata.json"
+  ],
+  "openai_embeddings": 0,
+  "local_embeddings": 117,
+  "tfidf_features": 5000,
+  "subthreads_count": 117,
+  "compression_ratios": {
+    "openai": 0,
+    "local": 2.1670063064475285,
+    "tfidf": 36.70185234562479
+  }
+}

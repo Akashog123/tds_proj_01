@@ -156,18 +156,18 @@ class RailwaySearchEngine:
             self.save_precomputed_tfidf()
         except Exception as e:
             logger.error(f"Error building TF-IDF index: {e}")
-def save_precomputed_tfidf(self):
-    """Save computed TF-IDF index for future use"""
-    tfidf_file = Path("precomputed_embeddings") / "tfidf_data.pkl"
-    try:
-        with open(tfidf_file, "wb") as f:
-            pickle.dump({
-                "matrix": self.tfidf_matrix,
-                "vectorizer": self.vectorizer
-            }, f)
-        logger.info("✅ Saved TF-IDF index to precomputed file")
-    except Exception as e:
-        logger.error(f"Error saving precomputed TF-IDF: {e}")
+    def save_precomputed_tfidf(self):
+        """Save computed TF-IDF index for future use"""
+        tfidf_file = Path("precomputed_embeddings") / "tfidf_data.pkl"
+        try:
+            with open(tfidf_file, "wb") as f:
+                pickle.dump({
+                    "matrix": self.tfidf_matrix,
+                    "vectorizer": self.vectorizer
+                }, f)
+            logger.info("✅ Saved TF-IDF index to precomputed file")
+        except Exception as e:
+            logger.error(f"Error saving precomputed TF-IDF: {e}")
     
     def search(self, query: str, top_k: int = 5) -> List[Dict[str, Any]]:
         """Search using TF-IDF"""

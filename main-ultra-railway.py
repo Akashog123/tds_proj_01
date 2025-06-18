@@ -9,10 +9,10 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from pydantic import BaseModel
 
-# Import the fast hybrid search engine for better answers
-from fast_hybrid_search_engine import FastHybridEmbeddingSearchEngine
+# Import the ultra-lightweight search engine
+from ultra_lightweight_engine import UltraLightweightSearchEngine
 
-# Load environment variables from .env file
+# Load environment variables
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -23,25 +23,27 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Add startup diagnostics
-logger.info("=== TDS Virtual TA (Railway) Startup Diagnostics ===")
+# Startup diagnostics for ultra-lightweight deployment
+logger.info("=== TDS Virtual TA (Ultra-Lightweight Railway) Startup ===")
 logger.info(f"Python version: {sys.version}")
 logger.info(f"Working directory: {os.getcwd()}")
 logger.info(f"PORT environment variable: {os.getenv('PORT', 'Not set')}")
-logger.info(f"OPENAI_API_KEY set: {'Yes' if os.getenv('OPENAI_API_KEY') else 'No'}")
-logger.info(f"OPENAI_BASE_URL: {os.getenv('OPENAI_BASE_URL', 'Not set')}")
+logger.info("🚀 Ultra-lightweight mode: NO external API dependencies")
+logger.info("📦 Using precomputed embeddings only")
 
-# Check critical files
-discourse_file = "discourse_posts.json"
-logger.info(f"discourse_posts.json exists: {os.path.exists(discourse_file)}")
-if os.path.exists(discourse_file):
-    logger.info(f"discourse_posts.json size: {os.path.getsize(discourse_file) / 1024:.1f} KB")
+# Check for precomputed data
+precomputed_dir = "precomputed_ultra"
+logger.info(f"Precomputed directory exists: {os.path.exists(precomputed_dir)}")
+if os.path.exists(precomputed_dir):
+    import glob
+    files = glob.glob(f"{precomputed_dir}/*")
+    logger.info(f"Precomputed files: {[os.path.basename(f) for f in files]}")
 
 # Create FastAPI app
 app = FastAPI(
-    title="TDS Virtual TA API (Railway)",
-    description="Lightweight Teaching Assistant API for TDS course using Railway deployment",
-    version="2.0.0"
+    title="TDS Virtual TA API (Ultra-Lightweight Railway)",
+    description="Ultra-lightweight Teaching Assistant API using precomputed embeddings only",
+    version="3.0.0"
 )
 
 # Add CORS middleware
@@ -59,13 +61,15 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization", "Accept"],
 )
 
-# Initialize fast hybrid search engine for Railway
-logger.info("Initializing FastHybridEmbeddingSearchEngine...")
+# Initialize ultra-lightweight search engine
+logger.info("🔧 Initializing UltraLightweightSearchEngine...")
 try:
-    search_engine = FastHybridEmbeddingSearchEngine()
-    logger.info("✅ FastHybridEmbeddingSearchEngine initialized successfully")
+    search_engine = UltraLightweightSearchEngine()
+    stats = search_engine.get_stats()
+    logger.info("✅ UltraLightweightSearchEngine initialized successfully")
+    logger.info(f"📊 Engine stats: {stats}")
 except Exception as e:
-    logger.error(f"❌ Failed to initialize FastHybridEmbeddingSearchEngine: {e}")
+    logger.error(f"❌ Failed to initialize UltraLightweightSearchEngine: {e}")
     logger.error(f"Exception type: {type(e).__name__}")
     import traceback
     logger.error(f"Traceback: {traceback.format_exc()}")
@@ -89,7 +93,7 @@ class QuestionResponse(BaseModel):
     links: List[Dict[str, str]]
 
 class SearchResult(BaseModel):
-    topic_id: int
+    topic_id: str
     topic_title: str
     content: str
     url: str
@@ -101,10 +105,12 @@ class QueryResponse(BaseModel):
     query: str
     results: List[SearchResult]
     total_results: int
-    search_engine: str = "hybrid_openai_embeddings"
+    search_engine: str = "ultra_lightweight_precomputed"
 
-class QuestionAnswerer:
-    def __init__(self, search_engine: FastHybridEmbeddingSearchEngine):
+class UltraLightweightQuestionAnswerer:
+    """Ultra-lightweight question answerer using precomputed data only"""
+    
+    def __init__(self, search_engine: UltraLightweightSearchEngine):
         self.search_engine = search_engine
 
     def extract_relevant_excerpt(self, post: Dict[str, Any], query: str, max_length: int = 200) -> str:
@@ -140,17 +146,18 @@ class QuestionAnswerer:
             
         return excerpt
 
-    def generate_answer_from_hybrid_search(self, query: str, search_results: List[Dict[str, Any]]) -> str:
-        """Generate answer using hybrid search results without direct GPT prompting"""
+    def generate_answer_from_precomputed_search(self, query: str, search_results: List[Dict[str, Any]]) -> str:
+        """Generate answer using precomputed search results"""
         if not search_results:
-            return "I couldn't find relevant information in the discourse posts to answer your question. Please try rephrasing your question or check the course materials directly."
+            return "I couldn't find relevant information in the precomputed discourse posts to answer your question. Please try rephrasing your question or check the course materials directly."
         
-        # Get the best result from hybrid search
+        # Get the best result from precomputed search
         best_result = search_results[0]
         
         # Check if it's from staff
         author = best_result.get('author', '')
-        is_staff_answer = author in self.search_engine.staff_authors
+        staff_authors = self.search_engine.staff_authors
+        is_staff_answer = author in staff_authors
         
         # Generate answer based on content
         content = best_result.get('content', '')
@@ -160,7 +167,7 @@ class QuestionAnswerer:
         # Create answer prefix based on author and relevance
         if is_staff_answer:
             answer_prefix = f"According to {author} (course staff), "
-        elif score > 0.8:  # High confidence from hybrid search
+        elif score > 0.8:  # High confidence from search
             answer_prefix = "Based on the most relevant discussion in the course forum, "
         else:
             answer_prefix = "Based on the discussions in the course forum, "
@@ -181,11 +188,12 @@ class QuestionAnswerer:
         return answer
 
     def answer_question(self, question: str, top_k: int = 5) -> Dict[str, Any]:
-        # Get relevant context from hybrid search (OpenAI + local embeddings)
+        """Answer question using ultra-lightweight precomputed search"""
+        # Get relevant context from precomputed search
         search_results = self.search_engine.search(question, top_k=top_k)
         
-        # Generate intelligent answer using hybrid search results
-        answer = self.generate_answer_from_hybrid_search(question, search_results)
+        # Generate answer using precomputed search results
+        answer = self.generate_answer_from_precomputed_search(question, search_results)
         
         # Format response with search results
         sources = []
@@ -210,34 +218,38 @@ class QuestionAnswerer:
             "answer": answer,
             "confidence": confidence,
             "sources": sources,
-            "search_method": "hybrid_openai_local_embeddings"
+            "search_method": "ultra_lightweight_precomputed"
         }
 
 # Initialize question answerer
-qa_system = QuestionAnswerer(search_engine)
+qa_system = UltraLightweightQuestionAnswerer(search_engine)
 
 # API Routes
 @app.get("/")
 async def root():
+    stats = search_engine.get_stats()
     return {
-        "message": "TDS Virtual TA API (Railway)",
-        "version": "2.0.0",
+        "message": "TDS Virtual TA API (Ultra-Lightweight Railway)",
+        "version": "3.0.0",
         "status": "running",
-        "search_engine": "hybrid_openai_embeddings",
-        "features": ["hybrid_search", "openai_embeddings", "chromadb", "railway_optimized"]
+        "search_engine": "ultra_lightweight_precomputed",
+        "features": ["precomputed_embeddings", "ultra_fast_startup", "no_external_apis"],
+        "stats": stats
     }
 
 @app.get("/health")
 async def health_check():
+    stats = search_engine.get_stats()
     return {
         "status": "healthy",
-        "search_engine": "hybrid_openai_embeddings",
-        "total_subthreads": len(search_engine.subthreads),
-        "has_chromadb": search_engine.collection is not None,
-        "has_openai_client": search_engine.openai_client is not None,
-        "has_local_model": search_engine.local_model is not None,
-        "has_tfidf_fallback": search_engine.tfidf_matrix is not None,
-        "deployment": "railway"
+        "search_engine": "ultra_lightweight_precomputed",
+        "total_subthreads": stats["total_subthreads"],
+        "has_openai_embeddings": stats["has_openai_embeddings"],
+        "has_local_embeddings": stats["has_local_embeddings"],
+        "has_tfidf": stats["has_tfidf"],
+        "deployment": "ultra_lightweight_railway",
+        "external_apis": "none",
+        "startup_mode": "precomputed_only"
     }
 
 @app.post("/search", response_model=QueryResponse)
@@ -279,26 +291,25 @@ async def ask_question(request: QueryRequest):
 @app.post("/api/", response_model=QuestionResponse)
 async def answer_question_api(request: QuestionRequest):
     """
-    Answer student questions based on discourse posts (compatible with main.py API)
+    Answer student questions based on precomputed discourse data (compatible with main.py API)
     
     - **question**: The student's question (required)
-    - **image**: Optional base64 encoded image attachment
+    - **image**: Optional base64 encoded image attachment (acknowledged but not processed)
     """
     try:
         logger.info(f"Received question via /api/: {request.question[:100]}...")
         
-        # Handle image if provided (basic processing)
+        # Handle image if provided (basic acknowledgment)
         if request.image:
             try:
                 import base64
                 # Validate base64 image (basic check)
                 base64.b64decode(request.image, validate=True)
-                logger.info("Image attachment received and validated")
-                # For now, we'll acknowledge the image but not process it fully
+                logger.info("Image attachment received and acknowledged (not processed in ultra-lightweight mode)")
             except Exception as e:
                 logger.warning(f"Invalid image data: {e}")
         
-        # Get answer using the existing QA system
+        # Get answer using the ultra-lightweight QA system
         answer_data = qa_system.answer_question(request.question, top_k=5)
         
         # Convert to the expected response format
@@ -310,11 +321,11 @@ async def answer_question_api(request: QuestionRequest):
             })
         
         response = QuestionResponse(
-            answer=answer_data.get('answer', 'No answer could be generated.'),
+            answer=answer_data.get('answer', 'No answer could be generated from precomputed data.'),
             links=links
         )
         
-        logger.info(f"Generated response with {len(links)} links via /api/")
+        logger.info(f"Generated response with {len(links)} links via /api/ (ultra-lightweight mode)")
         return response
         
     except Exception as e:

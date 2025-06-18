@@ -1,14 +1,51 @@
-# Development files
-test_api.py
-test_hybrid_search.py
-validate_promptfoo.py
-final_validation.py
+# Ultra-Lightweight Railway Deployment - Ignore unnecessary files
+
+# === OLD SEARCH ENGINES (NOT NEEDED) ===
+hybrid_search_engine.py
+railway_search_engine.py
+fast_hybrid_search_engine.py
+
+# === OLD MAIN FILES (NOT NEEDED) ===
+main.py
+main-railway.py
 run_server.py
 
-# Test data and configurations
-project-tds-virtual-ta-promptfoo.yaml
+# === PRECOMPUTATION SCRIPTS (NOT NEEDED IN PRODUCTION) ===
+precompute_embeddings.py
+precompute_embeddings_ultra.py
+data_scraper.py
 
-# Cache and temporary files
+# === TEST FILES (NOT NEEDED) ===
+test_*.py
+validate_promptfoo.py
+final_validation.py
+
+# === OLD EMBEDDINGS DIRECTORIES (NOT NEEDED) ===
+precomputed_embeddings/
+chroma_db/
+deployment_backup/
+
+# === DOCUMENTATION AND GUIDES (NOT NEEDED) ===
+*.md
+!README.md
+HYBRID_SEARCH_README.md
+RAILWAY_DEPLOYMENT_GUIDE.md
+ULTRA_LIGHTWEIGHT_DEPLOYMENT_GUIDE.md
+
+# === OLD REQUIREMENTS FILES (NOT NEEDED) ===
+requirements.txt
+requirements-railway.txt
+
+# === DEVELOPMENT FILES ===
+project-tds-virtual-ta-promptfoo.yaml
+deploy_ultra_lightweight.py
+deployment_summary.json
+
+# === AUTHENTICATION AND CONFIG FILES ===
+auth.json
+.env
+
+# === CACHE AND TEMPORARY FILES ===
 __pycache__/
 *.pyc
 *.pyo
@@ -18,31 +55,26 @@ __pycache__/
 .pytest_cache/
 .coverage
 
-# Development environment
-.env
+# === DEVELOPMENT ENVIRONMENT ===
 .venv/
 venv/
 ENV/
 
-# IDE files
+# === IDE FILES ===
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Documentation (if large)
-*.md
-!README.md
-
-# Git files
+# === GIT FILES ===
 .git/
 .gitignore
 
-# Log files
+# === LOG FILES ===
 *.log
 
-# OS generated files
+# === OS GENERATED FILES ===
 .DS_Store
 .DS_Store?
 ._*
@@ -51,11 +83,13 @@ ENV/
 ehthumbs.db
 Thumbs.db
 
-# Authentication files
-auth.json
-
-# ChromaDB persistent storage (but keep precomputed embeddings)
-chroma_db/
-./chroma_db/
-!precomputed_embeddings/
-!.nixpacks/
+# === KEEP ESSENTIAL FILES FOR ULTRA-LIGHTWEIGHT DEPLOYMENT ===
+# The following files are REQUIRED and should NOT be ignored:
+# - main-ultra-railway.py (main application)
+# - ultra_lightweight_engine.py (search engine)
+# - requirements-ultra-light.txt (minimal dependencies)
+# - precomputed_ultra/ (precomputed data directory)
+# - discourse_posts.json (raw data)
+# - railway.toml (Railway configuration)
+# - nixpacks.toml (Nixpacks configuration)
+# - .nixpacks/ (Nixpacks files)
