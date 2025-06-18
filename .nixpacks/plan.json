@@ -5,13 +5,16 @@
   },
   "phases": {
     "setup": {
-      "nixPkgs": ["python39", "python39Packages.pip", "python39Packages.virtualenv"]
+      "nixPkgs": ["python39Full", "python39Packages.pip", "python39Packages.setuptools", "python39Packages.wheel"]
     },
     "install": {
       "cmds": [
         "echo '🚀 NIXPACKS: Installing Python dependencies...'",
         "python --version",
-        "python -m pip --version", 
+        "which python",
+        "python -c 'import sys; print(sys.executable)'",
+        "python -m ensurepip --upgrade || echo 'ensurepip not available'",
+        "python -m pip --version || (echo 'Installing pip manually' && python -c 'import urllib.request; urllib.request.urlretrieve(\"https://bootstrap.pypa.io/get-pip.py\", \"get-pip.py\")' && python get-pip.py)",
         "python -m pip install --upgrade pip",
         "python -m pip install -r requirements.txt",
         "echo '✅ NIXPACKS: Dependencies installed successfully'"
