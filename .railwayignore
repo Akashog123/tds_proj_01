@@ -36,6 +36,14 @@ ULTRA_LIGHTWEIGHT_DEPLOYMENT_GUIDE.md
 requirements.txt
 requirements-railway.txt
 
+# === EXCLUDE FILES WITH CHROMADB DEPENDENCIES ===
+hybrid_search_engine.py
+fast_hybrid_search_engine.py
+railway_search_engine.py
+main.py
+main-railway.py
+precompute_embeddings.py
+
 # === DEVELOPMENT FILES ===
 project-tds-virtual-ta-promptfoo.yaml
 deploy_ultra_lightweight.py

@@ -14,7 +14,7 @@ cmds = [
     "python -m venv /opt/venv",
     "source /opt/venv/bin/activate",
     "/opt/venv/bin/python -m pip install --upgrade pip",
-    "/opt/venv/bin/python -m pip install -r requirements-railway.txt",
+    "/opt/venv/bin/python -m pip install -r requirements-ultra-light.txt",
     "echo '✅ NIXPACKS: Dependencies installed successfully'"
 ]
 
@@ -24,11 +24,11 @@ cmds = [
     "source /opt/venv/bin/activate",
     "/opt/venv/bin/python -c \"import sys; print('Python version: ' + sys.version)\"",
     "/opt/venv/bin/python -c \"import os; print('discourse_posts.json exists: ' + str(os.path.exists('discourse_posts.json')))\"",
-    "/opt/venv/bin/python -c \"from railway_search_engine import RailwaySearchEngine; print('Railway search engine import successful')\"",
-    "/opt/venv/bin/python -c \"import sklearn, numpy, requests; print('Core dependencies imported successfully')\"",
+    "/opt/venv/bin/python -c \"from ultra_lightweight_engine import UltraLightweightSearchEngine; print('Ultra-lightweight search engine import successful')\"",
+    "/opt/venv/bin/python -c \"import numpy; print('Core dependencies imported successfully')\"",
     "/opt/venv/bin/python -c \"import fastapi, uvicorn; print('FastAPI and uvicorn imported successfully')\"",
     "echo '✅ NIXPACKS: Build completed successfully'"
 ]
 
 [start]
-cmd = "/opt/venv/bin/python -m uvicorn main-railway:app --host 0.0.0.0 --port $PORT"
+cmd = "/opt/venv/bin/python -m uvicorn main-ultra-railway:app --host 0.0.0.0 --port $PORT"
