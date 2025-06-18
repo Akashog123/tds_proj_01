@@ -21,10 +21,12 @@ cmds = [
 [phases.build]
 cmds = [
     "echo '🔧 NIXPACKS: Building application...'",
-    "python -c \"import sys; print('Python version: ' + sys.version)\"",
-    "python -c \"import os; print('discourse_posts.json exists: ' + str(os.path.exists('discourse_posts.json')))\"",
-    "python -c \"from railway_search_engine import RailwaySearchEngine; print('Railway search engine import successful')\"",
-    "python -c \"import sklearn, numpy, requests; print('Core dependencies imported successfully')\"",
+    "source /opt/venv/bin/activate",
+    "/opt/venv/bin/python -c \"import sys; print('Python version: ' + sys.version)\"",
+    "/opt/venv/bin/python -c \"import os; print('discourse_posts.json exists: ' + str(os.path.exists('discourse_posts.json')))\"",
+    "/opt/venv/bin/python -c \"from railway_search_engine import RailwaySearchEngine; print('Railway search engine import successful')\"",
+    "/opt/venv/bin/python -c \"import sklearn, numpy, requests; print('Core dependencies imported successfully')\"",
+    "/opt/venv/bin/python -c \"import fastapi, uvicorn; print('FastAPI and uvicorn imported successfully')\"",
     "echo '✅ NIXPACKS: Build completed successfully'"
 ]
 
